@@ -10,23 +10,29 @@ import { ViewState } from './types';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
+  const [searchInitialQuery, setSearchInitialQuery] = useState<string>('');
+
+  const handleSearchNavigation = (query: string) => {
+    setSearchInitialQuery(query);
+    setCurrentView(ViewState.SEARCH);
+  };
 
   const renderView = () => {
     switch (currentView) {
       case ViewState.HOME:
-        return <HomeView onNavigate={setCurrentView} />;
+        return <HomeView onNavigate={setCurrentView} onSearch={handleSearchNavigation} />;
       case ViewState.DIAGNOSIS:
         return <DiagnosisView />;
       case ViewState.CHAT:
-        return <ChatView />;
+        return <ChatView onNavigate={setCurrentView} />;
       case ViewState.SEARCH:
-        return <SearchView onNavigate={setCurrentView} />;
+        return <SearchView onNavigate={setCurrentView} initialQuery={searchInitialQuery} />;
       case ViewState.FAVORITES:
         return <FavoritesView />;
       case ViewState.PROFILE:
         return <ProfileView />;
       default:
-        return <HomeView onNavigate={setCurrentView} />;
+        return <HomeView onNavigate={setCurrentView} onSearch={handleSearchNavigation} />;
     }
   };
 

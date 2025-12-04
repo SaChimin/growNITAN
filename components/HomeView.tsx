@@ -4,9 +4,10 @@ import { Search, Heart, Bell, Scissors, Shirt, Footprints, Watch, Wallet, Chevro
 
 interface HomeViewProps {
   onNavigate: (view: ViewState) => void;
+  onSearch: (query: string) => void;
 }
 
-const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
+const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSearch }) => {
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const bannerScrollRef = useRef<HTMLDivElement>(null);
@@ -66,14 +67,6 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
     }
   ];
 
-  const navTabs = [
-    { id: ViewState.HOME, label: 'ホーム' },
-    { id: ViewState.DIAGNOSIS, label: '診断' },
-    { id: ViewState.CHAT, label: '相談' },
-    { id: ViewState.FAVORITES, label: 'お気に入り' },
-    { id: ViewState.PROFILE, label: 'マイページ' },
-  ];
-
   const banners = [
     {
         id: 'sale',
@@ -81,7 +74,7 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         subtitle: 'MAX 90% OFF (嘘)',
         buttonText: '会場はこちら',
         bgClass: 'bg-gradient-to-tr from-black to-gray-800',
-        onClick: () => onNavigate(ViewState.SEARCH)
+        onClick: () => onSearch('メンズファッション セール')
     },
     {
         id: 'new',
@@ -89,7 +82,7 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         subtitle: '春の新作アイテム続々入荷',
         buttonText: 'チェックする',
         bgClass: 'bg-gradient-to-tr from-blue-900 to-slate-800',
-        onClick: () => onNavigate(ViewState.SEARCH)
+        onClick: () => onSearch('メンズ 春服 新作')
     },
     {
         id: 'diagnosis',
@@ -190,7 +183,12 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             <Search size={16} />
             <span className="text-xs">ブランド、古着、アイテム...</span>
          </div>
-         <Bell size={20} className="text-primary" />
+         <button 
+            onClick={() => alert('現在、新しいお知らせはありません。')}
+            className="text-primary hover:text-gray-600 transition-colors"
+         >
+            <Bell size={20} />
+         </button>
       </div>
 
       <div className="pb-8">
@@ -254,39 +252,21 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             </div>
         </div>
 
-        {/* Tab Indicator (Sticky) */}
-        <div className="sticky top-[61px] z-20 bg-white border-b border-gray-100 w-full overflow-x-auto no-scrollbar shadow-sm">
-            <div className="flex px-2 min-w-full justify-between sm:justify-start sm:gap-6">
-                {navTabs.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => onNavigate(tab.id)}
-                        className={`flex-1 sm:flex-none py-3 px-2 text-xs font-bold text-center relative whitespace-nowrap transition-colors ${
-                            tab.id === ViewState.HOME 
-                            ? 'text-primary' 
-                            : 'text-gray-400 hover:text-gray-600'
-                        }`}
-                    >
-                        {tab.label}
-                        {tab.id === ViewState.HOME && (
-                            <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-primary rounded-t-full" />
-                        )}
-                    </button>
-                ))}
-            </div>
-        </div>
-
         {/* Category Menu */}
         <div className="bg-white mt-2 py-4 px-4">
             <div className="flex justify-between items-start">
                 {[
-                    { label: 'ヘアー', icon: Scissors },
-                    { label: 'ファッション', icon: Shirt },
-                    { label: 'シューズ', icon: Footprints },
-                    { label: 'アクセサリー', icon: Watch },
-                    { label: '小物', icon: Wallet },
+                    { label: 'ヘアー', icon: Scissors, query: 'メンズ ヘアスタイル トレンド' },
+                    { label: 'ファッション', icon: Shirt, query: 'メンズファッション トレンド' },
+                    { label: 'シューズ', icon: Footprints, query: 'メンズ スニーカー 人気' },
+                    { label: 'アクセサリー', icon: Watch, query: 'メンズ アクセサリー' },
+                    { label: '小物', icon: Wallet, query: 'メンズ 財布 バッグ' },
                 ].map((cat, idx) => (
-                    <button key={idx} className="flex flex-col items-center gap-2 group w-14">
+                    <button 
+                        key={idx} 
+                        onClick={() => onSearch(cat.query)}
+                        className="flex flex-col items-center gap-2 group w-14"
+                    >
                         <div className="w-12 h-12 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shadow-sm">
                             <cat.icon size={20} strokeWidth={1.5} />
                         </div>
@@ -300,12 +280,21 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         <div className="bg-white mt-2 py-4">
             <div className="flex justify-between items-center px-4 mb-4">
                 <h3 className="font-bold text-sm">PICK UP</h3>
-                <span className="text-xs text-secondary">すべて見る</span>
+                <button 
+                    onClick={() => onSearch('メンズファッション おすすめ')}
+                    className="text-xs text-secondary hover:text-blue-700"
+                >
+                    すべて見る
+                </button>
             </div>
             
             <div className="flex overflow-x-auto px-4 gap-3 no-scrollbar">
                  {pickupItems.map((item) => (
-                     <div key={item.id} className="flex-shrink-0 w-36 group relative">
+                     <div 
+                        key={item.id} 
+                        onClick={() => onSearch(item.searchQuery)}
+                        className="flex-shrink-0 w-36 group relative cursor-pointer"
+                     >
                          <div className="aspect-[3/4] bg-gray-50 rounded-sm mb-2 relative overflow-hidden">
                             <img 
                                 src={item.imageUrl} 
@@ -337,7 +326,11 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             <h3 className="font-bold text-sm mb-4">ランキング</h3>
             <div className="space-y-4">
                 {rankingItems.map((item, index) => (
-                    <div key={item.id} className="flex gap-4 items-start border-b border-gray-100 pb-4 last:border-0 relative">
+                    <div 
+                        key={item.id} 
+                        onClick={() => onSearch(item.searchQuery)}
+                        className="flex gap-4 items-start border-b border-gray-100 pb-4 last:border-0 relative cursor-pointer hover:bg-gray-50 transition-colors rounded-sm p-1"
+                    >
                         <div className="w-8 text-center font-black text-xl italic text-gray-300">{index + 1}</div>
                         <div className="w-20 h-24 bg-gray-50 rounded-sm flex-shrink-0 overflow-hidden">
                              <img 
@@ -354,7 +347,7 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
                         {/* Favorite Button */}
                         <button
                             onClick={(e) => toggleFavorite(item, e)}
-                            className="absolute right-0 top-1 p-2 text-gray-400 transition-transform active:scale-95"
+                            className="absolute right-0 top-1 p-2 text-gray-400 transition-transform active:scale-95 hover:text-red-400"
                         >
                             <Heart
                                 size={20}

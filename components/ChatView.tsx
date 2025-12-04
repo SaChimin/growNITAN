@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, ChevronLeft, MoreHorizontal } from 'lucide-react';
-import { ChatMessage } from '../types';
+import { ChatMessage, ViewState } from '../types';
 import { createCoachChat } from '../services/geminiService';
 import { Chat, GenerateContentResponse } from "@google/genai";
 
-const ChatView: React.FC = () => {
+interface ChatViewProps {
+  onNavigate: (view: ViewState) => void;
+}
+
+const ChatView: React.FC<ChatViewProps> = ({ onNavigate }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -80,18 +84,36 @@ const ChatView: React.FC = () => {
     }
   };
 
+  const handleMenu = () => {
+    if (window.confirm('会話の履歴を消去してリセットしますか？')) {
+        setMessages([{
+            id: Date.now().toString(),
+            role: 'model',
+            text: "よう！また会ったな。何か悩みか？",
+            timestamp: new Date()
+        }]);
+        chatSessionRef.current = createCoachChat();
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-[#8E9DCC]/10">
       {/* Header */}
       <div className="px-4 py-3 bg-white border-b border-gray-200 flex items-center justify-between sticky top-0 z-10 shadow-sm">
-        <button className="text-gray-600">
+        <button 
+            onClick={() => onNavigate(ViewState.HOME)}
+            className="text-gray-600 hover:text-primary transition-colors"
+        >
             <ChevronLeft size={24} />
         </button>
         <div className="text-center">
             <h1 className="text-sm font-bold text-primary">アニキ (AI Coach)</h1>
             <span className="text-[10px] text-green-500 font-bold">● Online</span>
         </div>
-        <button className="text-gray-600">
+        <button 
+            onClick={handleMenu}
+            className="text-gray-600 hover:text-primary transition-colors"
+        >
             <MoreHorizontal size={24} />
         </button>
       </div>

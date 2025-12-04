@@ -4,6 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <title>垢抜けアニキ</title>
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="#222222" />
+    
+    <!-- iOS support -->
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3050/3050253.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="垢抜けアニキ">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -36,6 +47,8 @@
       }
       body {
         font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+        /* iOSでのバウンススクロールを防ぎ、アプリっぽくする */
+        overscroll-behavior-y: none;
       }
     </style>
   <script type="importmap">

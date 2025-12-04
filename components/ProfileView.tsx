@@ -1,30 +1,188 @@
-import React from 'react';
-import { User, Settings, Package, Clock, CreditCard, ChevronRight, HelpCircle, Heart, Bell } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Settings, Package, Clock, CreditCard, ChevronRight, HelpCircle, Heart, Bell, Save, Check } from 'lucide-react';
+import { UserProfile } from '../types';
 
 const ProfileView: React.FC = () => {
+  const [profile, setProfile] = useState<UserProfile>({
+    name: 'ゲスト',
+    height: '',
+    age: '',
+    skinType: '普通肌',
+    hairStyle: 'マッシュ',
+    concerns: ''
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+
   const menuItems = [
     { icon: Package, label: '注文履歴' },
     { icon: Clock, label: '閲覧履歴' },
     { icon: Heart, label: 'お気に入りアイテム' },
     { icon: Bell, label: 'お知らせ' },
     { icon: CreditCard, label: 'ポイント・クーポン' },
-    { icon: Settings, label: '会員登録情報' },
     { icon: HelpCircle, label: 'ヘルプ・お問い合わせ' },
   ];
+
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('akanuke_user_profile');
+    if (savedProfile) {
+      try {
+        setProfile(JSON.parse(savedProfile));
+      } catch (e) {
+        console.error('Failed to parse profile', e);
+      }
+    }
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setProfile(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = () => {
+    localStorage.setItem('akanuke_user_profile', JSON.stringify(profile));
+    setSaveMessage('プロフィールを保存したぜ！');
+    setIsEditing(false);
+    setTimeout(() => setSaveMessage(''), 3000);
+  };
+
+  const handleClick = (label: string) => {
+      alert(`${label}機能は現在準備中です。今後のアップデートをお待ちください！`);
+  };
 
   return (
     <div className="flex flex-col h-full bg-background overflow-y-auto no-scrollbar pb-24">
        {/* User Info Header */}
-       <div className="bg-white p-6 flex items-center gap-4 border-b border-gray-100">
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
-                <User size={32} className="text-gray-300" />
-            </div>
-            <div>
-                <h2 className="text-lg font-bold mb-1">ゲスト 様</h2>
-                <div className="flex gap-2">
-                    <span className="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">レギュラー会員</span>
-                    <span className="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-sm">0 pt</span>
+       <div className="bg-white p-6 border-b border-gray-100">
+            <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
+                    <User size={32} className="text-gray-300" />
                 </div>
+                <div>
+                    <h2 className="text-lg font-bold mb-1">{profile.name || 'ゲスト'} 様</h2>
+                    <div className="flex gap-2">
+                        <span className="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">レギュラー会員</span>
+                        <span className="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-sm">0 pt</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Profile Form Area */}
+            <div className="bg-gray-50 p-4 rounded-sm border border-gray-100">
+                <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-xs font-bold text-gray-500 flex items-center gap-1">
+                        <Settings size={12} />
+                        基本データ (AI診断に使用)
+                    </h3>
+                    <button 
+                        onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                        className={`text-xs font-bold px-3 py-1.5 rounded-sm flex items-center gap-1 transition-colors ${
+                            isEditing 
+                            ? 'bg-primary text-white hover:bg-gray-800' 
+                            : 'bg-white border border-gray-200 text-primary hover:bg-gray-100'
+                        }`}
+                    >
+                        {isEditing ? <><Save size={12} /> 保存</> : '編集'}
+                    </button>
+                </div>
+
+                <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="text-[10px] font-bold text-gray-400 block mb-1">名前</label>
+                            <input 
+                                type="text" 
+                                name="name"
+                                value={profile.name}
+                                onChange={handleChange}
+                                disabled={!isEditing}
+                                className="w-full text-sm font-bold bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-bold text-gray-400 block mb-1">年齢</label>
+                            <input 
+                                type="number" 
+                                name="age"
+                                value={profile.age}
+                                onChange={handleChange}
+                                disabled={!isEditing}
+                                placeholder="例: 22"
+                                className="w-full text-sm font-bold bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="text-[10px] font-bold text-gray-400 block mb-1">身長 (cm)</label>
+                            <input 
+                                type="number" 
+                                name="height"
+                                value={profile.height}
+                                onChange={handleChange}
+                                disabled={!isEditing}
+                                placeholder="例: 175"
+                                className="w-full text-sm font-bold bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-bold text-gray-400 block mb-1">肌質</label>
+                            <select 
+                                name="skinType"
+                                value={profile.skinType}
+                                onChange={handleChange}
+                                disabled={!isEditing}
+                                className="w-full text-sm font-bold bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500 appearance-none"
+                            >
+                                <option value="普通肌">普通肌</option>
+                                <option value="乾燥肌">乾燥肌</option>
+                                <option value="脂性肌">脂性肌</option>
+                                <option value="混合肌">混合肌</option>
+                                <option value="敏感肌">敏感肌</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="text-[10px] font-bold text-gray-400 block mb-1">現在の髪型</label>
+                        <select 
+                            name="hairStyle"
+                            value={profile.hairStyle}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                            className="w-full text-sm font-bold bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500 appearance-none"
+                        >
+                            <option value="ショート">ショート（短髪）</option>
+                            <option value="マッシュ">マッシュ</option>
+                            <option value="センターパート">センターパート</option>
+                            <option value="パーマ">パーマ</option>
+                            <option value="ミディアム">ミディアム</option>
+                            <option value="ロング">ロング</option>
+                            <option value="ボウズ">ボウズ</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="text-[10px] font-bold text-gray-400 block mb-1">悩み・目標（AIへの共有事項）</label>
+                        <textarea 
+                            name="concerns"
+                            value={profile.concerns}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                            placeholder="例: 足が短く見えるのが悩み。大人っぽくなりたい。"
+                            rows={2}
+                            className="w-full text-xs bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500 resize-none"
+                        />
+                    </div>
+                </div>
+
+                {saveMessage && (
+                    <div className="mt-3 flex items-center text-green-600 text-xs font-bold animate-pulse">
+                        <Check size={14} className="mr-1" />
+                        {saveMessage}
+                    </div>
+                )}
             </div>
        </div>
 
@@ -45,7 +203,11 @@ const ProfileView: React.FC = () => {
        {/* Menu List */}
        <div className="bg-white mt-2 border-y border-gray-100">
             {menuItems.map((item, idx) => (
-                <button key={idx} className="w-full flex items-center justify-between p-4 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition-colors">
+                <button 
+                    key={idx} 
+                    onClick={() => handleClick(item.label)}
+                    className="w-full flex items-center justify-between p-4 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                >
                     <div className="flex items-center gap-3">
                         <item.icon size={20} className="text-gray-400" />
                         <span className="text-sm font-medium text-primary">{item.label}</span>
@@ -57,7 +219,10 @@ const ProfileView: React.FC = () => {
         
        {/* Other Links */}
        <div className="mt-6 px-4">
-           <button className="w-full bg-white text-gray-400 py-3 text-xs font-bold border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors">
+           <button 
+                onClick={() => alert('ログアウトしました（デモ）。')}
+                className="w-full bg-white text-gray-400 py-3 text-xs font-bold border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors"
+            >
                ログアウト
            </button>
            <div className="text-center mt-6 mb-8">

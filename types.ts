@@ -55,3 +55,12 @@ export interface SearchResponse {
   advice: string;
   items: SearchItem[];
 }
+
+export interface UserProfile {
+  name: string;
+  height: string;
+  age: string;
+  skinType: string;
+  hairStyle: string;
+  concerns: string;
+}

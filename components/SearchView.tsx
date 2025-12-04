@@ -17,20 +17,21 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '' }
 
   useEffect(() => {
     if (initialQuery) {
-      handleSearch();
+      setQuery(initialQuery);
+      handleSearch(initialQuery);
     } else {
       inputRef.current?.focus();
     }
-  }, []);
+  }, [initialQuery]);
 
-  const handleSearch = async () => {
-    if (!query.trim()) return;
+  const handleSearch = async (searchQuery: string = query) => {
+    if (!searchQuery.trim()) return;
 
-    setLoading({ isLoading: true, message: 'トレンドを検索し、商品イメージを生成中...' });
+    setLoading({ isLoading: true, message: '商品を検索中...' });
     setResults(null);
 
     try {
-      const data = await searchFashionItems(query);
+      const data = await searchFashionItems(searchQuery);
       setResults(data);
     } catch (error) {
       console.error(error);
@@ -57,6 +58,14 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '' }
   const openSearch = (searchQuery: string) => {
     const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery + " メンズファッション 通販")}`;
     window.open(url, '_blank');
+  };
+
+  const handleMockFilter = () => {
+      alert('絞り込み機能は現在開発中です。');
+  };
+
+  const handleMockSort = () => {
+      alert('並び替え機能は現在開発中です。');
   };
 
   return (
@@ -88,27 +97,26 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '' }
         {loading.isLoading ? (
           <div className="flex flex-col items-center justify-center h-64 text-center px-6">
              <Spinner message={loading.message} />
-             <p className="text-[10px] text-gray-400 mt-4">
-                アニキがWebからトレンドを探し、<br/>イメージ画像を生成しています...
-             </p>
           </div>
         ) : results ? (
           <div className="pb-20">
-            {/* Advice Section */}
-            <div className="bg-white p-4 mb-2 border-b border-gray-100">
-               <div className="text-[10px] font-bold text-gray-400 mb-1">アニキのアドバイス</div>
-               <p className="text-xs text-gray-700 leading-relaxed">{results.advice}</p>
-            </div>
+            {/* Advice Section Removed per request */}
 
             {/* Controls */}
             <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 mb-2">
                 <span className="text-xs font-bold text-gray-500">{results.items.length}件</span>
                 <div className="flex gap-4">
-                    <button className="flex items-center text-xs font-bold text-gray-500">
+                    <button 
+                        onClick={handleMockSort}
+                        className="flex items-center text-xs font-bold text-gray-500 hover:text-primary"
+                    >
                         <ArrowUpDown size={12} className="mr-1" />
                         おすすめ順
                     </button>
-                    <button className="flex items-center text-xs font-bold text-gray-500">
+                    <button 
+                        onClick={handleMockFilter}
+                        className="flex items-center text-xs font-bold text-gray-500 hover:text-primary"
+                    >
                         <Filter size={12} className="mr-1" />
                         絞り込み
                     </button>
@@ -180,7 +188,7 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '' }
                 {['ワイドパンツ', '韓国ファッション', '白Tシャツ', 'ネックレス メンズ', 'セットアップ'].map(tag => (
                     <button 
                         key={tag}
-                        onClick={() => { setQuery(tag); setTimeout(handleSearch, 0); }}
+                        onClick={() => { setQuery(tag); handleSearch(tag); }}
                         className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:border-secondary hover:text-secondary transition-colors"
                     >
                         {tag}
@@ -191,11 +199,17 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '' }
              <div className="mt-8 border-t border-gray-100 pt-6">
                 <h3 className="text-xs font-bold text-gray-500 mb-3">トレンドカテゴリー</h3>
                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-gray-50 p-4 rounded-sm text-center">
+                    <div 
+                        onClick={() => { setQuery('メンズ トップス 新作'); handleSearch('メンズ トップス 新作'); }}
+                        className="bg-gray-50 p-4 rounded-sm text-center cursor-pointer hover:bg-gray-100"
+                    >
                         <span className="text-2xl block mb-1">👕</span>
                         <span className="text-xs font-bold">トップス</span>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-sm text-center">
+                    <div 
+                        onClick={() => { setQuery('メンズ パンツ トレンド'); handleSearch('メンズ パンツ トレンド'); }}
+                        className="bg-gray-50 p-4 rounded-sm text-center cursor-pointer hover:bg-gray-100"
+                    >
                         <span className="text-2xl block mb-1">👖</span>
                         <span className="text-xs font-bold">パンツ</span>
                     </div>

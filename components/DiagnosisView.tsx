@@ -54,6 +54,22 @@ const DiagnosisView: React.FC = () => {
     setError(null);
   };
 
+  const handleShare = async () => {
+      if (analysis && navigator.share) {
+          try {
+              await navigator.share({
+                  title: '垢抜けアニキ ファッション診断',
+                  text: `俺のファッションスコアは${analysis.score}点だったぜ！ #垢抜けアニキ`,
+                  url: window.location.href
+              });
+          } catch (err) {
+              console.log('Share canceled');
+          }
+      } else {
+          alert('お使いのブラウザはシェア機能に対応していません。スクリーンショットを撮って共有してくれ！');
+      }
+  };
+
   if (loading.isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-4 bg-white">
@@ -84,7 +100,10 @@ const DiagnosisView: React.FC = () => {
                     <div className="text-[10px] text-gray-400">170cm / MEN</div>
                 </div>
             </div>
-            <button className="text-gray-400">
+            <button 
+                onClick={handleShare}
+                className="text-gray-400 hover:text-primary transition-colors"
+            >
                 <Share2 size={20} />
             </button>
         </div>
