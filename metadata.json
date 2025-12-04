@@ -1,0 +1,8 @@
+{
+  "name": "Copy of 垢抜けアニキ - ファッションコーチ",
+  "description": "男性向けのファッション診断＆自分磨きアプリ。Gemini APIを活用して、あなたの「垢抜け」を強力サポート。",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
