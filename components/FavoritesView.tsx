@@ -1,9 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
 import { FashionItem } from '../types';
 
-const FavoritesView: React.FC = () => {
+interface FavoritesViewProps {
+  onItemSelect?: (item: FashionItem) => void;
+  onScrollDirectionChange?: (direction: 'up' | 'down') => void;
+}
+
+const FavoritesView: React.FC<FavoritesViewProps> = ({ onItemSelect, onScrollDirectionChange }) => {
   const [favorites, setFavorites] = useState<FashionItem[]>([]);
+
+  // Scroll Detection
+  const lastScrollY = useRef(0);
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const currentScrollY = e.currentTarget.scrollTop;
+    const diff = currentScrollY - lastScrollY.current;
+    
+    if (Math.abs(diff) > 10) {
+        if (diff > 0) {
+            onScrollDirectionChange?.('down');
+        } else {
+            onScrollDirectionChange?.('up');
+        }
+        lastScrollY.current = currentScrollY;
+    }
+  };
 
   useEffect(() => {
     loadFavorites();
@@ -29,9 +50,14 @@ const FavoritesView: React.FC = () => {
     localStorage.setItem('akanuke_favorites_data', JSON.stringify(updated));
   };
 
-  const openSearch = (searchQuery: string) => {
-    const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery + " 通販")}`;
-    window.open(url, '_blank');
+  const handleClick = (item: FashionItem) => {
+      if (onItemSelect) {
+          onItemSelect(item);
+      } else {
+          // Fallback if no handler
+          const url = `https://www.google.com/search?q=${encodeURIComponent(item.searchQuery || item.name + " 通販")}`;
+          window.open(url, '_blank');
+      }
   };
 
   return (
@@ -42,13 +68,16 @@ const FavoritesView: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto no-scrollbar p-2 pb-24">
+      <div 
+        className="flex-1 overflow-y-auto no-scrollbar p-2 pb-24"
+        onScroll={handleScroll}
+      >
         {favorites.length > 0 ? (
           <div className="grid grid-cols-2 gap-2">
             {favorites.map((item) => (
               <div 
                 key={item.id} 
-                onClick={() => openSearch(item.searchQuery || item.name)}
+                onClick={() => handleClick(item)}
                 className="bg-white rounded-sm overflow-hidden border border-gray-100 relative group cursor-pointer"
               >
                 <div className="aspect-[3/4] bg-gray-50 relative overflow-hidden">

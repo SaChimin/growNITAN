@@ -3,7 +3,9 @@ export enum ViewState {
   COACH = 'COACH', // 診断とチャットを統合
   SEARCH = 'SEARCH',
   FAVORITES = 'FAVORITES',
-  PROFILE = 'PROFILE'
+  PROFILE = 'PROFILE',
+  PRODUCT_DETAIL = 'PRODUCT_DETAIL', // 追加: 商品詳細
+  HISTORY = 'HISTORY' // 追加: 閲覧履歴
 }
 
 export interface FashionItem {

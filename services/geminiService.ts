@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { FashionAnalysis, SearchResponse, SearchItem, UserProfile } from "../types";
+import { FashionAnalysis, SearchResponse, SearchItem, UserProfile, FashionItem } from "../types";
 
 // Initialize the client
 // NOTE: Ensure process.env.API_KEY is available in your environment
@@ -267,4 +267,29 @@ export const searchFashionItems = async (query: string): Promise<SearchResponse>
     advice: "", // No advice returned
     items: itemsToReturn
   };
+};
+
+/**
+ * Gets related items for the product detail view.
+ * Mocks the logic by returning random items from DB excluding the current one.
+ */
+export const getRelatedItems = async (currentItemName: string): Promise<FashionItem[]> => {
+    // Simulate slight network delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Random shuffle
+    const shuffled = [...MOCK_DB].sort(() => 0.5 - Math.random());
+    
+    // Return top 4 items that are NOT the current item
+    return shuffled
+        .filter(item => item.name !== currentItemName)
+        .slice(0, 4)
+        .map((item, idx) => ({
+            id: `rel-${Date.now()}-${idx}`,
+            name: item.name,
+            brand: item.brand,
+            description: item.description,
+            searchQuery: item.searchQuery,
+            imageUrl: `https://pollinations.ai/p/${encodeURIComponent(item.imagePrompt)}?width=400&height=500&model=flux&seed=${Math.floor(Math.random() * 1000)}`
+        }));
 };

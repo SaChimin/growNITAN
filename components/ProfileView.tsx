@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { User, Settings, Package, Clock, CreditCard, ChevronRight, HelpCircle, Heart, Bell, Save, Check } from 'lucide-react';
-import { UserProfile } from '../types';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Settings, Clock, ChevronRight, HelpCircle, Heart, Save, Check } from 'lucide-react';
+import { UserProfile, ViewState } from '../types';
 
-const ProfileView: React.FC = () => {
+interface ProfileViewProps {
+  onNavigate?: (view: ViewState) => void;
+  onScrollDirectionChange?: (direction: 'up' | 'down') => void;
+}
+
+const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirectionChange }) => {
   const [profile, setProfile] = useState<UserProfile>({
     name: 'ゲスト',
     height: '',
@@ -14,13 +19,26 @@ const ProfileView: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
 
+  // Scroll Detection
+  const lastScrollY = useRef(0);
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const currentScrollY = e.currentTarget.scrollTop;
+    const diff = currentScrollY - lastScrollY.current;
+    
+    if (Math.abs(diff) > 10) {
+        if (diff > 0) {
+            onScrollDirectionChange?.('down');
+        } else {
+            onScrollDirectionChange?.('up');
+        }
+        lastScrollY.current = currentScrollY;
+    }
+  };
+
   const menuItems = [
-    { icon: Package, label: '注文履歴' },
-    { icon: Clock, label: '閲覧履歴' },
-    { icon: Heart, label: 'お気に入りアイテム' },
-    { icon: Bell, label: 'お知らせ' },
-    { icon: CreditCard, label: 'ポイント・クーポン' },
-    { icon: HelpCircle, label: 'ヘルプ・お問い合わせ' },
+    { icon: Clock, label: '閲覧履歴', action: () => onNavigate?.(ViewState.HISTORY) },
+    { icon: Heart, label: 'お気に入りアイテム', action: () => onNavigate?.(ViewState.FAVORITES) },
+    { icon: HelpCircle, label: 'ヘルプ・お問い合わせ', action: null },
   ];
 
   useEffect(() => {
@@ -46,12 +64,19 @@ const ProfileView: React.FC = () => {
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
-  const handleClick = (label: string) => {
-      alert(`${label}機能は現在準備中です。今後のアップデートをお待ちください！`);
+  const handleClick = (item: { label: string, action: (() => void) | null }) => {
+      if (item.action) {
+          item.action();
+      } else {
+          alert(`${item.label}機能は現在準備中です。今後のアップデートをお待ちください！`);
+      }
   };
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-y-auto no-scrollbar pb-24">
+    <div 
+        className="flex flex-col h-full bg-background overflow-y-auto no-scrollbar pb-24"
+        onScroll={handleScroll}
+    >
        {/* User Info Header */}
        <div className="bg-white p-6 border-b border-gray-100">
             <div className="flex items-center gap-4 mb-4">
@@ -205,7 +230,7 @@ const ProfileView: React.FC = () => {
             {menuItems.map((item, idx) => (
                 <button 
                     key={idx} 
-                    onClick={() => handleClick(item.label)}
+                    onClick={() => handleClick(item)}
                     className="w-full flex items-center justify-between p-4 border-b border-gray-50 last:border-0 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                 >
                     <div className="flex items-center gap-3">

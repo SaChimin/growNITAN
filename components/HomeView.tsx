@@ -1,34 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ViewState, FashionItem } from '../types';
-import { Search, Heart, Bell, Scissors, Shirt, Footprints, Watch, Wallet, ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
+import { Search, Heart, Scissors, Shirt, Footprints, Watch, Wallet, ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react';
 
 interface HomeViewProps {
   onNavigate: (view: ViewState) => void;
   onSearch: (query: string) => void;
+  onItemSelect: (item: FashionItem) => void;
+  onScrollDirectionChange?: (direction: 'up' | 'down') => void;
 }
 
 // カテゴリーIDの型定義
 type CategoryId = 'all' | 'hair' | 'fashion' | 'shoes' | 'accessory' | 'goods';
 
-const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSearch }) => {
+const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSearch, onItemSelect, onScrollDirectionChange }) => {
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [activeCategoryId, setActiveCategoryId] = useState<CategoryId>('all');
   const bannerScrollRef = useRef<HTMLDivElement>(null);
   const isResettingRef = useRef(false);
+  
+  // Scroll Detection
+  const lastScrollY = useRef(0);
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const currentScrollY = e.currentTarget.scrollTop;
+    const diff = currentScrollY - lastScrollY.current;
+    
+    // 感度調整: 10px以上の移動で判定
+    if (Math.abs(diff) > 10) {
+        if (diff > 0) {
+            onScrollDirectionChange?.('down');
+        } else {
+            onScrollDirectionChange?.('up');
+        }
+        lastScrollY.current = currentScrollY;
+    }
+  };
 
   // カテゴリーごとのデータ定義
   const categoryData: Record<CategoryId, { pickup: FashionItem[]; ranking: FashionItem[] }> = {
     all: {
         pickup: [
-            { id: 'pickup-1', brand: 'GU', name: 'ヘビーウェイトビッグT(5分袖)', imageUrl: 'https://pollinations.ai/p/white%20heavyweight%20t-shirt%20men%20fashion%20studio%20minimal?width=400&height=500&model=flux&seed=101', searchQuery: 'GU ヘビーウェイトビッグT' },
-            { id: 'pickup-2', brand: 'UNIQLO', name: 'タックワイドパンツ', imageUrl: 'https://pollinations.ai/p/grey%20wide%20trousers%20men%20fashion%20studio?width=400&height=500&model=flux&seed=102', searchQuery: 'UNIQLO タックワイドパンツ' },
-            { id: 'pickup-3', brand: 'ZARA', name: 'チャンキーソールスニーカー', imageUrl: 'https://pollinations.ai/p/chunky%20white%20sneakers%20men%20studio?width=400&height=500&model=flux&seed=103', searchQuery: 'ZARA メンズ スニーカー' }
+            { id: 'pickup-1', brand: 'GU', name: 'ヘビーウェイトビッグT(5分袖)', imageUrl: 'https://pollinations.ai/p/white%20heavyweight%20t-shirt%20men%20fashion%20studio%20minimal?width=400&height=500&model=flux&seed=101', searchQuery: 'GU ヘビーウェイトビッグT', description: 'しっかりとした厚手のコットン素材を使用。繰り返し洗ってもヨレにくいのが特徴。オーバーサイズシルエットで、リラックスした着こなしに最適。' },
+            { id: 'pickup-2', brand: 'UNIQLO', name: 'タックワイドパンツ', imageUrl: 'https://pollinations.ai/p/grey%20wide%20trousers%20men%20fashion%20studio?width=400&height=500&model=flux&seed=102', searchQuery: 'UNIQLO タックワイドパンツ', description: '繊細なドレープ感と上品な光沢感が特徴。ウエストに入ったタックが腰回りをすっきり見せつつ、ワイドなシルエットでトレンド感を演出。' },
+            { id: 'pickup-3', brand: 'ZARA', name: 'チャンキーソールスニーカー', imageUrl: 'https://pollinations.ai/p/chunky%20white%20sneakers%20men%20studio?width=400&height=500&model=flux&seed=103', searchQuery: 'ZARA メンズ スニーカー', description: 'ボリュームのあるソールが特徴的なダッドスニーカー。身長盛れ効果もあり、シンプルなコーデのアクセントとして活躍する一足。' }
         ],
         ranking: [
-            { id: 'rank-1', brand: 'THE NORTH FACE', name: 'バーサタイルショーツ', imageUrl: 'https://pollinations.ai/p/north%20face%20shorts%20men%20black%20outdoor?width=400&height=500&model=flux&seed=201', searchQuery: 'ノースフェイス バーサタイルショーツ' },
-            { id: 'rank-2', brand: 'NIKE', name: 'エアフォース1 \'07', imageUrl: 'https://pollinations.ai/p/nike%20air%20force%201%20white%20sneakers?width=400&height=500&model=flux&seed=202', searchQuery: 'NIKE エアフォース1' },
-            { id: 'rank-3', brand: 'Champion', name: 'リバースウィーブ Tシャツ', imageUrl: 'https://pollinations.ai/p/champion%20grey%20t-shirt%20men%20logo?width=400&height=500&model=flux&seed=203', searchQuery: 'Champion Tシャツ メンズ' }
+            { id: 'rank-1', brand: 'THE NORTH FACE', name: 'バーサタイルショーツ', imageUrl: 'https://pollinations.ai/p/north%20face%20shorts%20men%20black%20outdoor?width=400&height=500&model=flux&seed=201', searchQuery: 'ノースフェイス バーサタイルショーツ', description: '軽量で乾きやすいナイロン素材を使用をショートパンツ。撥水加工が施されており、アウトドアからタウンユースまで幅広く使える。' },
+            { id: 'rank-2', brand: 'NIKE', name: 'エアフォース1 \'07', imageUrl: 'https://pollinations.ai/p/nike%20air%20force%201%20white%20sneakers?width=400&height=500&model=flux&seed=202', searchQuery: 'NIKE エアフォース1', description: '1982年に登場したバスケットボールシューズの名作。クリーンなホワイトカラーはどんなスタイルにもマッチする鉄板アイテム。' },
+            { id: 'rank-3', brand: 'Champion', name: 'リバースウィーブ Tシャツ', imageUrl: 'https://pollinations.ai/p/champion%20grey%20t-shirt%20men%20logo?width=400&height=500&model=flux&seed=203', searchQuery: 'Champion Tシャツ メンズ', description: '生地を横向きに使用することで縦縮みを軽減した「リバースウィーブ」製法。着込むほどに味が出る、アメカジの定番。' }
         ]
     },
     hair: {
@@ -244,7 +263,10 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSearch }) => {
   const displayIndex = currentBannerIndex >= originalBanners.length ? 0 : currentBannerIndex;
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto no-scrollbar bg-background">
+    <div 
+        className="flex flex-col h-full overflow-y-auto no-scrollbar bg-background"
+        onScroll={handleScroll}
+    >
       {/* Header / Search Bar */}
       <div className="sticky top-0 z-30 bg-white px-4 py-3 border-b border-gray-100 flex items-center gap-3">
          <div 
@@ -254,12 +276,6 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSearch }) => {
             <Search size={16} />
             <span className="text-xs">ブランド、古着、アイテム...</span>
          </div>
-         <button 
-            onClick={() => alert('現在、新しいお知らせはありません。')}
-            className="text-primary hover:text-gray-600 transition-colors"
-         >
-            <Bell size={20} />
-         </button>
       </div>
 
       <div className="pb-8">
@@ -376,7 +392,7 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSearch }) => {
                  {currentItems.pickup.map((item) => (
                      <div 
                         key={item.id} 
-                        onClick={() => onSearch(item.searchQuery)}
+                        onClick={() => onItemSelect(item)}
                         className="flex-shrink-0 w-36 group relative cursor-pointer"
                      >
                          <div className="aspect-[3/4] bg-gray-50 rounded-sm mb-2 relative overflow-hidden">
@@ -416,7 +432,7 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSearch }) => {
                 {currentItems.ranking.map((item, index) => (
                     <div 
                         key={item.id} 
-                        onClick={() => onSearch(item.searchQuery)}
+                        onClick={() => onItemSelect(item)}
                         className="flex gap-4 items-start border-b border-gray-100 pb-4 last:border-0 relative cursor-pointer hover:bg-gray-50 transition-colors rounded-sm p-1 animate-fadeIn"
                     >
                         <div className="w-8 text-center font-black text-xl italic text-gray-300">{index + 1}</div>
