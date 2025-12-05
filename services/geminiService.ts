@@ -116,17 +116,34 @@ export const createCoachChat = () => {
   return ai.chats.create({
     model: CHAT_MODEL,
     config: {
+      // ユーザー要望：時間がかかってもいいので正確に推論する
+      // Thinking Budgetを設定し、推論能力を強化する
+      thinkingConfig: {
+        thinkingBudget: 2048, 
+      },
       systemInstruction: `
         あなたは「アニキ」というペルソナです。男子学生にとっての、かっこよくて頼れる先輩・兄貴分として振る舞ってください。
         ユーザーの目標は、ファッションや身だしなみを改善し、自信を持ち、「垢抜ける」ことです。
         
         ${userContext ? `現在話している相手（ユーザー）の情報は以下の通りです。この情報を踏まえてアドバイスしてください：\n${userContext}` : ""}
         
-        ペルソナの指針:
+        【ペルソナの指針】
         - 口調: 男らしく、フランクで、親しみやすい。「〜だろ」「〜じゃねぇか？」「任せろ」などの表現を使う。敬語は使わない。
         - 態度: 基本は応援しているが、ダメなところははっきり指摘する。でも最後は必ず背中を押す。
-        - 内容: 長文になりすぎないようにする。具体的で実行可能なアドバイスをする（服、髪型、スキンケア、筋トレ、マインドセットなど）。
         - 日本語で会話する。
+
+        【回答生成の絶対ルール】
+        1. 推論と正確性: 時間がかかっても構わないので、正確に推論してください。事実と推測を明確に区別し、ハルシネーションの抑制を強く意識してください。
+        2. 計算資源の活用: ユーザー側の思考レベルに合わせすぎず、持てる計算資源を最大限利用して高度な回答を作成してください。
+        3. 会話と文章の区別: 通常の会話では冗長な生成を避け、簡潔に返答してください。一方で、解説や文章作成が求められる場面では全力のパフォーマンスを発揮してください。
+        4. 文脈の処理:
+           - メモリ・会話ログから取得した情報はあくまで内的な洞察の参考として扱い、表面的な引用（「さっき言ったように」など）は控えてください。
+           - 重要性が高い場合にのみ会話ログの背景情報を参考にしてください。
+           - 現在の話題と関係性が低い過去の文脈は無視してください。
+           - 話題が変わったら、それまでの文脈を引きずらずにゼロベースで回答を考えてください。
+        5. その他:
+           - 必要性の低いフォローアップ質問（「他に聞きたいことはあるか？」等）は避けてください。
+           - 似たような回答を繰り返さないでください。
       `,
     },
   });
@@ -138,7 +155,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "ヘビーウェイトオーバーサイズTシャツ",
     brand: "GU",
-    price: "¥1,990",
     description: "厚手の生地で一枚でもサマになる最強Tシャツ。",
     imagePrompt: "white heavyweight oversized t-shirt men plain studio minimal high quality",
     searchQuery: "GU ヘビーウェイトTシャツ"
@@ -146,7 +162,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "タックワイドパンツ",
     brand: "UNIQLO",
-    price: "¥3,990",
     description: "きれいなシルエットで脚長効果抜群の神パンツ。",
     imagePrompt: "grey wide leg trousers men studio fashion clean minimal",
     searchQuery: "UNIQLO タックワイドパンツ メンズ"
@@ -154,7 +169,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "エアリズムコットンオーバーサイズT",
     brand: "UNIQLO U",
-    price: "¥1,990",
     description: "表面はコットン、裏面はエアリズムの快適ハイブリッド。",
     imagePrompt: "black oversized t-shirt men uniqlou texture studio",
     searchQuery: "ユニクロU エアリズムコットンオーバーサイズTシャツ"
@@ -162,7 +176,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "スーパースター (Superstar)",
     brand: "adidas",
-    price: "¥12,000",
     description: "ストリートの定番。どんなコーデにも合わせやすい。",
     imagePrompt: "adidas superstar sneakers white black stripes studio product",
     searchQuery: "adidas superstar 82"
@@ -170,7 +183,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "リラックスフィットオープンカラーシャツ",
     brand: "Global Work",
-    price: "¥4,500",
     description: "程よい抜け感が出る開襟シャツ。夏のマストバイ。",
     imagePrompt: "beige open collar shirt men relaxing fit summer studio",
     searchQuery: "メンズ オープンカラーシャツ"
@@ -178,7 +190,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "574 Legacy",
     brand: "New Balance",
-    price: "¥14,800",
     description: "履き心地抜群で、適度なボリューム感が今の気分。",
     imagePrompt: "new balance 574 grey sneakers men studio side view",
     searchQuery: "new balance 574 メンズ"
@@ -186,7 +197,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "チェーンネックレス 50cm",
     brand: "LION HEART",
-    price: "¥3,800",
     description: "首元のアクセントに。シンプルさが垢抜けの鍵。",
     imagePrompt: "silver chain necklace men minimalist jewelry studio close up",
     searchQuery: "メンズ シルバーネックレス シンプル"
@@ -194,7 +204,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "バギーデニムパンツ",
     brand: "WEGO",
-    price: "¥3,990",
     description: "トレンドの極太シルエット。古着ライクな着こなしに。",
     imagePrompt: "blue baggy denim jeans men vintage wash street style",
     searchQuery: "メンズ バギーデニム WEGO"
@@ -202,7 +211,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "オックスフォードシャツ",
     brand: "MUJI (無印良品)",
-    price: "¥2,990",
     description: "清潔感No.1。デートや少しきちんとした場に最適。",
     imagePrompt: "white oxford shirt men button down clean studio",
     searchQuery: "無印良品 オックスフォードシャツ メンズ"
@@ -210,7 +218,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "ロゴキャップ",
     brand: "THE NORTH FACE",
-    price: "¥4,800",
     description: "髪セットが面倒な時もこれさえ被ればおしゃれに。",
     imagePrompt: "black north face cap logo studio fashion hat",
     searchQuery: "ノースフェイス キャップ メンズ"
@@ -218,7 +225,6 @@ const MOCK_DB: SearchItem[] = [
     {
     name: "スウェットプルパーカ",
     brand: "GU",
-    price: "¥2,990",
     description: "フードの立ち上がりが良く、小顔効果も期待できる。",
     imagePrompt: "grey hoodie men streetwear studio blank basic",
     searchQuery: "GU スウェットプルパーカ"
@@ -226,7 +232,6 @@ const MOCK_DB: SearchItem[] = [
   {
     name: "カーゴパンツ",
     brand: "Dickies",
-    price: "¥6,500",
     description: "武骨な男らしさを演出できる定番ワークパンツ。",
     imagePrompt: "olive green cargo pants men tactical street studio",
     searchQuery: "Dickies カーゴパンツ メンズ"

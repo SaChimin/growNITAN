@@ -1,7 +1,6 @@
 export enum ViewState {
   HOME = 'HOME',
-  DIAGNOSIS = 'DIAGNOSIS',
-  CHAT = 'CHAT',
+  COACH = 'COACH', // 診断とチャットを統合
   SEARCH = 'SEARCH',
   FAVORITES = 'FAVORITES',
   PROFILE = 'PROFILE'
@@ -11,7 +10,6 @@ export interface FashionItem {
   id: string;
   name: string;
   brand: string;
-  price: string;
   imageUrl: string;
   searchQuery: string;
   description?: string;
@@ -45,7 +43,6 @@ export interface LoadingState {
 export interface SearchItem {
   name: string;
   brand: string;
-  price: string;
   description: string;
   imagePrompt: string; // 英語の画像生成用プロンプト
   searchQuery: string; // 実際の購入検索用クエリ

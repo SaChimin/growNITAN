@@ -164,10 +164,7 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '' }
                       {item.name}
                     </div>
                     <div className="flex items-center justify-between">
-                        <div className="text-sm font-bold text-primary">
-                            {item.price}
-                        </div>
-                        <span className="text-[9px] text-gray-400">詳細 &gt;</span>
+                        <span className="text-[9px] text-gray-400 ml-auto">詳細 &gt;</span>
                     </div>
                   </div>
                 </div>

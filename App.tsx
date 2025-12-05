@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import Navigation from './components/Navigation';
 import HomeView from './components/HomeView';
-import DiagnosisView from './components/DiagnosisView';
-import ChatView from './components/ChatView';
+import CoachView from './components/CoachView';
 import SearchView from './components/SearchView';
 import FavoritesView from './components/FavoritesView';
 import ProfileView from './components/ProfileView';
@@ -21,10 +20,8 @@ const App: React.FC = () => {
     switch (currentView) {
       case ViewState.HOME:
         return <HomeView onNavigate={setCurrentView} onSearch={handleSearchNavigation} />;
-      case ViewState.DIAGNOSIS:
-        return <DiagnosisView />;
-      case ViewState.CHAT:
-        return <ChatView onNavigate={setCurrentView} />;
+      case ViewState.COACH:
+        return <CoachView onNavigate={setCurrentView} />;
       case ViewState.SEARCH:
         return <SearchView onNavigate={setCurrentView} initialQuery={searchInitialQuery} />;
       case ViewState.FAVORITES:
@@ -44,10 +41,7 @@ const App: React.FC = () => {
       </main>
 
       {/* Navigation */}
-      {/* Hide navigation on Search view for full immersion */}
-      {currentView !== ViewState.SEARCH && (
-        <Navigation currentView={currentView} onNavigate={setCurrentView} />
-      )}
+      <Navigation currentView={currentView} onNavigate={setCurrentView} />
     </div>
   );
 };

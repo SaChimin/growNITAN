@@ -1,6 +1,6 @@
 import React from 'react';
 import { ViewState } from '../types';
-import { Camera, MessageCircle, Home, Heart, User } from 'lucide-react';
+import { Home, Heart, User, Sparkles, Search } from 'lucide-react';
 
 interface NavigationProps {
   currentView: ViewState;
@@ -10,8 +10,8 @@ interface NavigationProps {
 const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate }) => {
   const navItems = [
     { view: ViewState.HOME, label: 'ホーム', icon: Home },
-    { view: ViewState.DIAGNOSIS, label: '診断', icon: Camera },
-    { view: ViewState.CHAT, label: '相談', icon: MessageCircle },
+    { view: ViewState.SEARCH, label: '検索', icon: Search },
+    { view: ViewState.COACH, label: 'AI', icon: Sparkles },
     { view: ViewState.FAVORITES, label: 'お気に入り', icon: Heart },
     { view: ViewState.PROFILE, label: 'マイページ', icon: User },
   ];

@@ -63,7 +63,6 @@ const FavoritesView: React.FC = () => {
                 <div className="p-3">
                   <div className="text-[10px] text-gray-400 font-bold mb-1">{item.brand}</div>
                   <div className="text-xs font-bold text-primary mb-1 line-clamp-2 h-8 leading-tight">{item.name}</div>
-                  <div className="text-sm font-bold">{item.price}</div>
                 </div>
 
                 {/* Remove Button */}
