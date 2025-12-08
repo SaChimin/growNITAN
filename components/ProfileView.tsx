@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Settings, Clock, ChevronRight, HelpCircle, Heart, Save, Check } from 'lucide-react';
+import { User, Settings, Clock, ChevronRight, Heart, Save, Check } from 'lucide-react';
 import { UserProfile, ViewState } from '../types';
 
 interface ProfileViewProps {
@@ -41,7 +41,6 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirection
   const menuItems = [
     { icon: Clock, label: '閲覧履歴', action: () => onNavigate?.(ViewState.HISTORY) },
     { icon: Heart, label: 'お気に入りアイテム', action: () => onNavigate?.(ViewState.FAVORITES) },
-    { icon: HelpCircle, label: 'ヘルプ・お問い合わせ', action: null },
   ];
 
   useEffect(() => {

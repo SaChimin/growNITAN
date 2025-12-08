@@ -16,14 +16,7 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onScrollDirectionChan
   const [mode, setMode] = useState<CoachMode>('CHAT');
   
   // --- CHAT STATE ---
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      role: 'model',
-      text: "よう！アニキだ。ファッションの悩み、コーデの診断、なんでも任せろ。",
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -61,6 +54,36 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onScrollDirectionChan
 
   // --- CHAT LOGIC ---
   useEffect(() => {
+    // 初期メッセージの設定（プロフィールデータがある場合は反映）
+    try {
+        const savedProfile = localStorage.getItem('akanuke_user_profile');
+        let initialText = "よう！アニキだ。ファッションの悩み、コーデの診断、なんでも任せろ。";
+        
+        if (savedProfile) {
+            const p = JSON.parse(savedProfile);
+            if (p.name) {
+                initialText = `よう、${p.name}！アニキだ。${p.height ? `お前の身長（${p.height}cm）に合わせた` : 'お前にぴったりの'}コーデや悩み、なんでも相談してくれ。`;
+            } else if (p.height) {
+                initialText = `よう！身長${p.height}cmのアニキ流着こなし術、教えるぜ。何でも聞いてくれ。`;
+            }
+        }
+
+        // メッセージがまだない場合のみセット
+        setMessages(prev => {
+            if (prev.length === 0) {
+                return [{
+                    id: '1',
+                    role: 'model',
+                    text: initialText,
+                    timestamp: new Date()
+                }];
+            }
+            return prev;
+        });
+    } catch (e) {
+        console.error("Failed to load profile for chat init", e);
+    }
+
     if (!chatSessionRef.current) {
         chatSessionRef.current = createCoachChat();
     }
@@ -124,10 +147,20 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onScrollDirectionChan
 
   const handleChatReset = () => {
     if (window.confirm('会話の履歴を消去してリセットしますか？')) {
+        // プロフィールを再取得して挨拶をリセット
+        const savedProfile = localStorage.getItem('akanuke_user_profile');
+        let resetText = "よう！また会ったな。何か悩みか？";
+         if (savedProfile) {
+            const p = JSON.parse(savedProfile);
+            if (p.name) {
+                resetText = `よう、${p.name}！仕切り直しといこうか。何でも聞いてくれ。`;
+            }
+        }
+        
         setMessages([{
             id: Date.now().toString(),
             role: 'model',
-            text: "よう！また会ったな。何か悩みか？",
+            text: resetText,
             timestamp: new Date()
         }]);
         chatSessionRef.current = createCoachChat();
