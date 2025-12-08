@@ -23,10 +23,14 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onSearch, onItemSelect,
   const lastScrollY = useRef(0);
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const currentScrollY = e.currentTarget.scrollTop;
+    
+    // iOSバウンス対策（上部でのマイナススクロールは無視）
+    if (currentScrollY < 0) return;
+
     const diff = currentScrollY - lastScrollY.current;
     
-    // 感度調整: 10px以上の移動で判定
-    if (Math.abs(diff) > 10) {
+    // 感度調整: 5px以上の移動で判定（より敏感に反応するように変更）
+    if (Math.abs(diff) > 5) {
         if (diff > 0) {
             onScrollDirectionChange?.('down');
         } else {

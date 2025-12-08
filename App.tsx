@@ -53,7 +53,7 @@ const App: React.FC = () => {
       case ViewState.HOME:
         return <HomeView onNavigate={handleNavigate} onSearch={handleSearchNavigation} onItemSelect={handleProductSelect} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.COACH:
-        return <CoachView onNavigate={handleNavigate} />;
+        return <CoachView onNavigate={handleNavigate} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.SEARCH:
         return <SearchView onNavigate={handleNavigate} initialQuery={searchInitialQuery} onItemSelect={handleProductSelect} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.FAVORITES:

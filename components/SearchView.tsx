@@ -22,9 +22,12 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '', 
   const lastScrollY = useRef(0);
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const currentScrollY = e.currentTarget.scrollTop;
+    if (currentScrollY < 0) return;
+
     const diff = currentScrollY - lastScrollY.current;
     
-    if (Math.abs(diff) > 10) {
+    // 感度調整: 5px以上の移動で判定
+    if (Math.abs(diff) > 5) {
         if (diff > 0) {
             onScrollDirectionChange?.('down');
         } else {

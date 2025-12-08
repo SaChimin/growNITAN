@@ -7,11 +7,12 @@ import Spinner from './Spinner';
 
 interface CoachViewProps {
   onNavigate: (view: ViewState) => void;
+  onScrollDirectionChange?: (direction: 'up' | 'down') => void;
 }
 
 type CoachMode = 'CHAT' | 'DIAGNOSIS';
 
-const CoachView: React.FC<CoachViewProps> = ({ onNavigate }) => {
+const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onScrollDirectionChange }) => {
   const [mode, setMode] = useState<CoachMode>('CHAT');
   
   // --- CHAT STATE ---
@@ -34,6 +35,28 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate }) => {
   const [diagLoading, setDiagLoading] = useState<LoadingState>({ isLoading: false, message: '' });
   const [diagError, setDiagError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Scroll Detection for Diagnosis Mode
+  const lastScrollY = useRef(0);
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    // チャットモードではナビゲーションバーを制御しない（入力欄が動くと不便なため）
+    if (mode === 'CHAT') return;
+    
+    const currentScrollY = e.currentTarget.scrollTop;
+    if (currentScrollY < 0) return;
+
+    const diff = currentScrollY - lastScrollY.current;
+    
+    // 感度調整: 5px以上の移動で判定
+    if (Math.abs(diff) > 5) {
+        if (diff > 0) {
+            onScrollDirectionChange?.('down');
+        } else {
+            onScrollDirectionChange?.('up');
+        }
+        lastScrollY.current = currentScrollY;
+    }
+  };
 
 
   // --- CHAT LOGIC ---
@@ -295,7 +318,10 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate }) => {
 
       {/* --- DIAGNOSIS VIEW CONTENT --- */}
       {mode === 'DIAGNOSIS' && (
-          <div className="flex flex-col flex-1 overflow-y-auto no-scrollbar bg-white pb-24">
+          <div 
+            className="flex flex-col flex-1 overflow-y-auto no-scrollbar bg-white pb-24"
+            onScroll={handleScroll}
+          >
             {diagLoading.isLoading ? (
                 <div className="flex flex-col items-center justify-center flex-1 space-y-4 min-h-[50vh]">
                     <Spinner message={diagLoading.message} />
