@@ -18,24 +18,7 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '', 
   const [history, setHistory] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Scroll Detection
-  const lastScrollY = useRef(0);
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const currentScrollY = e.currentTarget.scrollTop;
-    if (currentScrollY < 0) return;
-
-    const diff = currentScrollY - lastScrollY.current;
-    
-    // 感度調整: 5px以上の移動で判定
-    if (Math.abs(diff) > 5) {
-        if (diff > 0) {
-            onScrollDirectionChange?.('down');
-        } else {
-            onScrollDirectionChange?.('up');
-        }
-        lastScrollY.current = currentScrollY;
-    }
-  };
+  // 検索画面ではスクロールによるナビゲーション制御を行わないため、スクロール検知ロジックは削除
 
   useEffect(() => {
     // Load history from local storage
@@ -164,10 +147,7 @@ const SearchView: React.FC<SearchViewProps> = ({ onNavigate, initialQuery = '', 
       </div>
 
       {/* Content */}
-      <div 
-        className="flex-1 overflow-y-auto no-scrollbar"
-        onScroll={handleScroll}
-      >
+      <div className="flex-1 overflow-y-auto no-scrollbar">
         {loading.isLoading ? (
           <div className="flex flex-col items-center justify-center h-64 text-center px-6">
              <Spinner message={loading.message} />
