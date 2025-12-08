@@ -7,12 +7,13 @@ import Spinner from './Spinner';
 
 interface CoachViewProps {
   onNavigate: (view: ViewState) => void;
+  onBack?: () => void; // 戻り先を指定するためのプロパティを追加
   onScrollDirectionChange?: (direction: 'up' | 'down') => void;
 }
 
 type CoachMode = 'CHAT' | 'DIAGNOSIS';
 
-const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onScrollDirectionChange }) => {
+const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onBack, onScrollDirectionChange }) => {
   const [mode, setMode] = useState<CoachMode>('CHAT');
   
   // --- CHAT STATE ---
@@ -234,7 +235,7 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onScrollDirectionChan
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20">
           <div className="px-4 py-3 flex items-center justify-between">
             <button 
-                onClick={() => onNavigate(ViewState.HOME)}
+                onClick={() => onBack ? onBack() : onNavigate(ViewState.HOME)}
                 className="text-gray-600 hover:text-primary transition-colors"
             >
                 <ChevronLeft size={24} />

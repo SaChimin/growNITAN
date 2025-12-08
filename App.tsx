@@ -13,11 +13,19 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
   const [searchInitialQuery, setSearchInitialQuery] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<FashionItem | null>(null);
-  const [previousView, setPreviousView] = useState<ViewState>(ViewState.HOME);
+  
+  // ナビゲーション履歴管理
+  const [previousView, setPreviousView] = useState<ViewState>(ViewState.HOME); // 商品詳細用
+  const [coachReturnView, setCoachReturnView] = useState<ViewState>(ViewState.HOME); // AIチャット用
+  
   const [isNavVisible, setIsNavVisible] = useState(true);
 
   // ビュー切り替え時はナビゲーションを表示状態に戻す
   const handleNavigate = (view: ViewState) => {
+    // Coach画面に行く場合、現在の画面を戻り先として保存
+    if (view === ViewState.COACH) {
+      setCoachReturnView(currentView);
+    }
     setCurrentView(view);
     setIsNavVisible(true);
   };
@@ -53,7 +61,8 @@ const App: React.FC = () => {
       case ViewState.HOME:
         return <HomeView onNavigate={handleNavigate} onSearch={handleSearchNavigation} onItemSelect={handleProductSelect} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.COACH:
-        return <CoachView onNavigate={handleNavigate} onScrollDirectionChange={handleScrollUpdate} />;
+        // onBackで記憶しておいた元の画面に戻る
+        return <CoachView onNavigate={handleNavigate} onBack={() => handleNavigate(coachReturnView)} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.SEARCH:
         return <SearchView onNavigate={handleNavigate} initialQuery={searchInitialQuery} onItemSelect={handleProductSelect} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.FAVORITES:

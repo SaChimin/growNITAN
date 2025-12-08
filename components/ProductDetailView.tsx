@@ -193,8 +193,7 @@ const ProductDetailView: React.FC<ProductDetailViewProps> = ({ item, onBack, onI
         <div className="p-4 bg-white border-b border-gray-100 flex flex-col gap-3">
             <button 
                 onClick={() => {
-                    // Navigate to Coach chat with context (Mock)
-                    alert('このアイテムを使ったコーデ相談は、現在準備中です。');
+                    // Navigate to Coach chat
                     onNavigate(ViewState.COACH);
                 }}
                 className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-black text-white py-3 rounded-sm font-bold text-sm shadow-md hover:opacity-90 transition-opacity"
