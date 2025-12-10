@@ -58,6 +58,7 @@ export interface SearchResponse {
 export interface UserProfile {
   name: string;
   height: string;
+  weight: string; // 追加
   age: string;
   skinType: string;
   hairStyle: string;

@@ -20,6 +20,7 @@ const getUserProfileContext = (): string => {
       if (p.name) context += `- 名前: ${p.name}\n`;
       if (p.age) context += `- 年齢: ${p.age}歳\n`;
       if (p.height) context += `- 身長: ${p.height}cm\n`;
+      if (p.weight) context += `- 体重: ${p.weight}kg\n`;
       if (p.skinType) context += `- 肌質: ${p.skinType}\n`;
       if (p.hairStyle) context += `- 現在の髪型: ${p.hairStyle}\n`;
       if (p.concerns) context += `- 悩み・目標: ${p.concerns}\n`;

@@ -11,6 +11,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirection
   const [profile, setProfile] = useState<UserProfile>({
     name: 'ゲスト',
     height: '',
+    weight: '', // 初期値追加
     age: '',
     skinType: '普通肌',
     hairStyle: 'マッシュ',
@@ -47,7 +48,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirection
     const savedProfile = localStorage.getItem('akanuke_user_profile');
     if (savedProfile) {
       try {
-        setProfile(JSON.parse(savedProfile));
+        setProfile(prev => ({ ...prev, ...JSON.parse(savedProfile) }));
       } catch (e) {
         console.error('Failed to parse profile', e);
       }
@@ -140,8 +141,8 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirection
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="col-span-1">
                             <label className="text-[10px] font-bold text-gray-400 block mb-1">身長 (cm)</label>
                             <input 
                                 type="number" 
@@ -149,11 +150,23 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirection
                                 value={profile.height}
                                 onChange={handleChange}
                                 disabled={!isEditing}
-                                placeholder="例: 175"
+                                placeholder="175"
                                 className="w-full text-sm font-bold bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
                             />
                         </div>
-                        <div>
+                        <div className="col-span-1">
+                            <label className="text-[10px] font-bold text-gray-400 block mb-1">体重 (kg)</label>
+                            <input 
+                                type="number" 
+                                name="weight"
+                                value={profile.weight}
+                                onChange={handleChange}
+                                disabled={!isEditing}
+                                placeholder="65"
+                                className="w-full text-sm font-bold bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500"
+                            />
+                        </div>
+                        <div className="col-span-1">
                             <label className="text-[10px] font-bold text-gray-400 block mb-1">肌質</label>
                             <select 
                                 name="skinType"
@@ -162,11 +175,11 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirection
                                 disabled={!isEditing}
                                 className="w-full text-sm font-bold bg-white border border-gray-200 rounded-sm px-2 py-1.5 focus:border-secondary focus:outline-none disabled:bg-gray-100 disabled:text-gray-500 appearance-none"
                             >
-                                <option value="普通肌">普通肌</option>
-                                <option value="乾燥肌">乾燥肌</option>
-                                <option value="脂性肌">脂性肌</option>
-                                <option value="混合肌">混合肌</option>
-                                <option value="敏感肌">敏感肌</option>
+                                <option value="普通肌">普通</option>
+                                <option value="乾燥肌">乾燥</option>
+                                <option value="脂性肌">脂性</option>
+                                <option value="混合肌">混合</option>
+                                <option value="敏感肌">敏感</option>
                             </select>
                         </div>
                     </div>
