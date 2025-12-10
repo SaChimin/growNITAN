@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Settings, Clock, ChevronRight, Heart, Save, Check, LogOut } from 'lucide-react';
+import { User, Settings, Clock, ChevronRight, Heart, Save, Check, LogOut, Lock, Info } from 'lucide-react';
 import { UserProfile, ViewState } from '../types';
 
 interface ProfileViewProps {
@@ -20,6 +20,9 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onLogout, onScrol
   });
   const [isEditing, setIsEditing] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+
+  // ゲスト判定（名前が'ゲスト'かどうかで簡易判定）
+  const isGuest = profile.name === 'ゲスト';
 
   // Scroll Detection
   const lastScrollY = useRef(0);
@@ -90,8 +93,12 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onLogout, onScrol
                 <div>
                     <h2 className="text-lg font-bold mb-1">{profile.name || 'ゲスト'} 様</h2>
                     <div className="flex gap-2">
-                        <span className="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">レギュラー会員</span>
-                        <span className="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-sm">0 pt</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-sm ${isGuest ? 'bg-gray-200 text-gray-500' : 'bg-primary text-white'}`}>
+                            {isGuest ? 'ゲスト会員' : 'レギュラー会員'}
+                        </span>
+                        {!isGuest && (
+                            <span className="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-sm">0 pt</span>
+                        )}
                     </div>
                 </div>
             </div>
@@ -103,19 +110,44 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onLogout, onScrol
                         <Settings size={12} />
                         基本データ (AI診断に使用)
                     </h3>
-                    <button 
-                        onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                        className={`text-xs font-bold px-3 py-1.5 rounded-sm flex items-center gap-1 transition-colors ${
-                            isEditing 
-                            ? 'bg-primary text-white hover:bg-gray-800' 
-                            : 'bg-white border border-gray-200 text-primary hover:bg-gray-100'
-                        }`}
-                    >
-                        {isEditing ? <><Save size={12} /> 保存</> : '編集'}
-                    </button>
+                    
+                    {!isGuest ? (
+                        <button 
+                            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                            className={`text-xs font-bold px-3 py-1.5 rounded-sm flex items-center gap-1 transition-colors ${
+                                isEditing 
+                                ? 'bg-primary text-white hover:bg-gray-800' 
+                                : 'bg-white border border-gray-200 text-primary hover:bg-gray-100'
+                            }`}
+                        >
+                            {isEditing ? <><Save size={12} /> 保存</> : '編集'}
+                        </button>
+                    ) : (
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400 bg-gray-200 px-2 py-1 rounded-sm">
+                            <Lock size={10} />
+                            編集不可
+                        </span>
+                    )}
                 </div>
 
-                <div className="space-y-3">
+                {/* Guest Restriction Message */}
+                {isGuest && (
+                    <div className="mb-4 bg-white border border-blue-100 p-3 rounded-sm flex gap-3">
+                        <Info size={16} className="text-secondary flex-shrink-0 mt-0.5" />
+                        <div>
+                            <p className="text-xs font-bold text-gray-600 mb-1">ゲストモードでは編集できません</p>
+                            <p className="text-[10px] text-gray-400 leading-tight">
+                                正確なAI診断を受けるために、身長や体重などのデータを保存するには
+                                <button onClick={onLogout} className="text-primary underline ml-1 hover:opacity-70">
+                                    アカウント登録
+                                </button>
+                                してください。
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                <div className={`space-y-3 ${isGuest ? 'opacity-60 grayscale-[0.5]' : ''}`}>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
                             <label className="text-[10px] font-bold text-gray-400 block mb-1">名前</label>
@@ -228,18 +260,20 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onLogout, onScrol
        </div>
 
        {/* Rank Banner */}
-       <div className="p-4">
-           <div className="bg-gradient-to-r from-gray-800 to-black text-white p-4 rounded-sm flex justify-between items-center shadow-md">
-               <div>
-                   <div className="text-xs font-bold text-gray-400 mb-1">アニキランク</div>
-                   <div className="text-xl font-black italic tracking-wider">BRONZE</div>
-               </div>
-               <div className="text-right">
-                   <div className="text-[10px] text-gray-400">次のランクまで</div>
-                   <div className="text-sm font-bold">あと <span className="text-yellow-400 text-lg">3</span> 回 診断</div>
-               </div>
-           </div>
-       </div>
+       {!isGuest && (
+        <div className="p-4">
+            <div className="bg-gradient-to-r from-gray-800 to-black text-white p-4 rounded-sm flex justify-between items-center shadow-md">
+                <div>
+                    <div className="text-xs font-bold text-gray-400 mb-1">アニキランク</div>
+                    <div className="text-xl font-black italic tracking-wider">BRONZE</div>
+                </div>
+                <div className="text-right">
+                    <div className="text-[10px] text-gray-400">次のランクまで</div>
+                    <div className="text-sm font-bold">あと <span className="text-yellow-400 text-lg">3</span> 回 診断</div>
+                </div>
+            </div>
+        </div>
+       )}
 
        {/* Menu List */}
        <div className="bg-white mt-2 border-y border-gray-100">
@@ -265,7 +299,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onLogout, onScrol
                 className="w-full bg-white text-gray-400 py-3 text-xs font-bold border border-gray-200 rounded-sm hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors flex items-center justify-center gap-2"
             >
                <LogOut size={14} />
-               ログアウト
+               {isGuest ? 'トップへ戻る' : 'ログアウト'}
            </button>
            <div className="text-center mt-6 mb-8">
                <div className="text-xs font-bold text-gray-300">AKANUKE BRO</div>
