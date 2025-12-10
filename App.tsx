@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from './components/Navigation';
 import HomeView from './components/HomeView';
 import CoachView from './components/CoachView';
@@ -7,9 +7,11 @@ import FavoritesView from './components/FavoritesView';
 import ProfileView from './components/ProfileView';
 import ProductDetailView from './components/ProductDetailView';
 import HistoryView from './components/HistoryView';
+import LoginView from './components/LoginView';
 import { ViewState, FashionItem } from './types';
 
 const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
   const [searchInitialQuery, setSearchInitialQuery] = useState<string>('');
   const [selectedItem, setSelectedItem] = useState<FashionItem | null>(null);
@@ -19,6 +21,27 @@ const App: React.FC = () => {
   const [coachReturnView, setCoachReturnView] = useState<ViewState>(ViewState.HOME); // AIチャット用
   
   const [isNavVisible, setIsNavVisible] = useState(true);
+
+  // 初回ロード時にログイン状態を確認
+  useEffect(() => {
+    const session = localStorage.getItem('akanuke_session');
+    if (session) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleLogin = () => {
+    localStorage.setItem('akanuke_session', 'active');
+    setIsLoggedIn(true);
+    setCurrentView(ViewState.HOME);
+  };
+
+  const handleLogout = () => {
+    // 確認ダイアログなしで即座にログアウト
+    localStorage.removeItem('akanuke_session');
+    setIsLoggedIn(false);
+    setCurrentView(ViewState.HOME); // Reset view
+  };
 
   // ビュー切り替え時はナビゲーションを表示状態に戻す
   const handleNavigate = (view: ViewState) => {
@@ -68,7 +91,8 @@ const App: React.FC = () => {
       case ViewState.FAVORITES:
         return <FavoritesView onItemSelect={handleProductSelect} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.PROFILE:
-        return <ProfileView onNavigate={handleNavigate} onScrollDirectionChange={handleScrollUpdate} />;
+        // onLogoutを渡す
+        return <ProfileView onNavigate={handleNavigate} onLogout={handleLogout} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.HISTORY:
         return <HistoryView onNavigate={handleNavigate} onItemSelect={handleProductSelect} onScrollDirectionChange={handleScrollUpdate} />;
       case ViewState.PRODUCT_DETAIL:
@@ -86,6 +110,11 @@ const App: React.FC = () => {
         return <HomeView onNavigate={handleNavigate} onSearch={handleSearchNavigation} onItemSelect={handleProductSelect} onScrollDirectionChange={handleScrollUpdate} />;
     }
   };
+
+  // ログインしていない場合はLoginViewを表示
+  if (!isLoggedIn) {
+      return <LoginView onLogin={handleLogin} />;
+  }
 
   return (
     <div className="flex flex-col h-[100dvh] max-w-md mx-auto bg-white shadow-xl overflow-hidden relative text-primary">

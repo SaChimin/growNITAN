@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Settings, Clock, ChevronRight, Heart, Save, Check } from 'lucide-react';
+import { User, Settings, Clock, ChevronRight, Heart, Save, Check, LogOut } from 'lucide-react';
 import { UserProfile, ViewState } from '../types';
 
 interface ProfileViewProps {
   onNavigate?: (view: ViewState) => void;
+  onLogout?: () => void; // 追加
   onScrollDirectionChange?: (direction: 'up' | 'down') => void;
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirectionChange }) => {
+const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onLogout, onScrollDirectionChange }) => {
   const [profile, setProfile] = useState<UserProfile>({
     name: 'ゲスト',
     height: '',
-    weight: '', // 初期値追加
+    weight: '',
     age: '',
     skinType: '普通肌',
     hairStyle: 'マッシュ',
@@ -260,9 +261,10 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate, onScrollDirection
        {/* Other Links */}
        <div className="mt-6 px-4">
            <button 
-                onClick={() => alert('ログアウトしました（デモ）。')}
-                className="w-full bg-white text-gray-400 py-3 text-xs font-bold border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors"
+                onClick={onLogout}
+                className="w-full bg-white text-gray-400 py-3 text-xs font-bold border border-gray-200 rounded-sm hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-colors flex items-center justify-center gap-2"
             >
+               <LogOut size={14} />
                ログアウト
            </button>
            <div className="text-center mt-6 mb-8">

@@ -128,6 +128,29 @@ export const createCoachChat = () => {
       thinkingConfig: {
         thinkingBudget: 2048, 
       },
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          text: {
+            type: Type.STRING,
+            description: "アニキとしての返答テキスト。150文字以内で具体的かつ簡潔に。",
+          },
+          recommendedItems: {
+            type: Type.ARRAY,
+            description: "会話の流れでおすすめすべきファッションアイテムがあれば必ず2つ提案する。特になくても、会話に関連するおしゃれなアイテムを2つひねり出すこと。",
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING, description: "アイテムの具体的な名称（例：黒のワイドスラックス）" },
+                imagePrompt: { type: Type.STRING, description: "そのアイテムの画像を生成するための英語プロンプト（例：black wide leg slacks men fashion studio white background）" }
+              },
+              required: ["name", "imagePrompt"]
+            }
+          }
+        },
+        required: ["text", "recommendedItems"]
+      },
       systemInstruction: `
         あなたは「アニキ」というペルソナだ。男子学生やファッション初心者のための、頼れる専属スタイリストとして振る舞え。
         
@@ -148,6 +171,7 @@ export const createCoachChat = () => {
         1. 「具体的」に答えろ: 曖昧な表現はNG。ブランド名、アイテム名、色、サイズ感を指定しろ。
         2. 「短く」答えろ: 1レスは2〜3文、長くても150文字以内。
         3. 「トレンド」を押さえろ。
+        4. 【重要】毎回必ず、おすすめのアイテムを「2つ」提案すること。会話の内容に合わせて画像生成用のプロンプトを作成しろ。
         
         口調は「〜だろ」「〜しろ」「任せろ」のような強気で頼れる兄貴口調（敬語禁止）。
       `,

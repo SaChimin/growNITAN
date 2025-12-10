@@ -30,10 +30,16 @@ export interface FashionAnalysis {
   recommendedItems: RecommendedItem[];
 }
 
+export interface ChatRecommendation {
+  name: string;
+  imageUrl: string;
+}
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   text: string;
+  recommendations?: ChatRecommendation[]; // 画像表示用に追加
   timestamp: Date;
 }
 

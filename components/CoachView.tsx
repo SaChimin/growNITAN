@@ -115,12 +115,33 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onBack, onScrollDirec
         message: userMsg.text
       });
       
-      const aiResponseText = result.text || "悪い、ちょっと考え事してた。もう一回言ってくれ。";
+      let aiResponseText = "悪い、ちょっと考え事してた。もう一回言ってくれ。";
+      let recommendations: { name: string, imageUrl: string }[] = [];
+
+      // JSON解析を試みる
+      if (result.text) {
+          try {
+              const parsed = JSON.parse(result.text);
+              aiResponseText = parsed.text || aiResponseText;
+              
+              if (parsed.recommendedItems && Array.isArray(parsed.recommendedItems)) {
+                  recommendations = parsed.recommendedItems.map((item: any, idx: number) => ({
+                      name: item.name,
+                      // Pollinations AIで画像生成
+                      imageUrl: `https://pollinations.ai/p/${encodeURIComponent(item.imagePrompt)}?width=400&height=500&model=flux&seed=${Math.floor(Math.random() * 1000) + idx}`
+                  })).slice(0, 2); // 念のため2つまで
+              }
+          } catch (e) {
+              console.warn("Response was not valid JSON, using raw text", e);
+              aiResponseText = result.text;
+          }
+      }
 
       const aiMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'model',
         text: aiResponseText,
+        recommendations: recommendations.length > 0 ? recommendations : undefined,
         timestamp: new Date()
       };
 
@@ -291,7 +312,7 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onBack, onScrollDirec
                         </div>
                     )}
                     
-                    <div className="max-w-[75%]">
+                    <div className="max-w-[85%]">
                         <div 
                         className={`p-3 text-sm leading-relaxed shadow-sm relative ${
                             msg.role === 'user' 
@@ -301,6 +322,28 @@ const CoachView: React.FC<CoachViewProps> = ({ onNavigate, onBack, onScrollDirec
                         >
                         {msg.text}
                         </div>
+                        
+                        {/* Recommendation Images */}
+                        {msg.recommendations && msg.recommendations.length > 0 && (
+                            <div className="mt-2 flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                                {msg.recommendations.map((item, idx) => (
+                                    <div key={idx} className="flex-shrink-0 w-32 bg-white p-2 rounded-sm border border-gray-100 shadow-sm">
+                                        <div className="aspect-[3/4] bg-gray-100 mb-2 rounded-sm overflow-hidden">
+                                            <img 
+                                                src={item.imageUrl} 
+                                                alt={item.name} 
+                                                className="w-full h-full object-cover"
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                        <div className="text-[10px] font-bold text-gray-600 line-clamp-2 leading-tight">
+                                            {item.name}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className={`text-[9px] text-gray-400 mt-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                             {msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </div>
