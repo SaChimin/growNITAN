@@ -1,11 +1,11 @@
 export enum ViewState {
   HOME = 'HOME',
-  COACH = 'COACH', // 診断とチャットを統合
+  COACH = 'COACH',
   SEARCH = 'SEARCH',
   FAVORITES = 'FAVORITES',
   PROFILE = 'PROFILE',
-  PRODUCT_DETAIL = 'PRODUCT_DETAIL', // 追加: 商品詳細
-  HISTORY = 'HISTORY' // 追加: 閲覧履歴
+  PRODUCT_DETAIL = 'PRODUCT_DETAIL',
+  HISTORY = 'HISTORY'
 }
 
 export interface FashionItem {
@@ -39,7 +39,7 @@ export interface ChatMessage {
   id: string;
   role: 'user' | 'model';
   text: string;
-  recommendations?: ChatRecommendation[]; // 画像表示用に追加
+  recommendations?: ChatRecommendation[];
   timestamp: Date;
 }
 
@@ -52,8 +52,8 @@ export interface SearchItem {
   name: string;
   brand: string;
   description: string;
-  imagePrompt: string; // 英語の画像生成用プロンプト
-  searchQuery: string; // 実際の購入検索用クエリ
+  imagePrompt: string;
+  searchQuery: string;
 }
 
 export interface SearchResponse {
@@ -64,7 +64,7 @@ export interface SearchResponse {
 export interface UserProfile {
   name: string;
   height: string;
-  weight: string; // 追加
+  weight: string;
   age: string;
   skinType: string;
   hairStyle: string;

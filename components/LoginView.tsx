@@ -88,13 +88,19 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
 
   const handleGuestLogin = () => {
       // ゲストプロフィールの設定
-      const savedProfile = localStorage.getItem('akanuke_user_profile');
-      if (!savedProfile) {
-          localStorage.setItem('akanuke_user_profile', JSON.stringify({
-              name: 'ゲスト',
-              height: '', weight: '', age: '', skinType: '普通肌', hairStyle: 'マッシュ', concerns: ''
-          }));
-      }
+      // 以前のログインデータが残っていても強制的にゲスト情報で上書きすることで、
+      // ProfileViewでの「編集不可」判定（name === 'ゲスト'）を確実に有効にする
+      const guestProfile = {
+          name: 'ゲスト',
+          height: '', 
+          weight: '', 
+          age: '', 
+          skinType: '普通肌', 
+          hairStyle: 'マッシュ', 
+          concerns: ''
+      };
+      
+      localStorage.setItem('akanuke_user_profile', JSON.stringify(guestProfile));
       onLogin();
   };
 

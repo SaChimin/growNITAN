@@ -21,12 +21,12 @@
         theme: {
           extend: {
             colors: {
-              primary: '#222222', // ZOZO Black
-              secondary: '#3B82F6', // Link Blue
-              accent: '#EF4444', // Sale/Alert Red
-              surface: '#FFFFFF', // White
-              background: '#F9FAFB', // Light Gray
-              subtext: '#6B7280', // Gray 500
+              primary: '#222222', 
+              secondary: '#3B82F6', 
+              accent: '#EF4444', 
+              surface: '#FFFFFF', 
+              background: '#F9FAFB', 
+              subtext: '#6B7280', 
             },
             fontFamily: {
               sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
@@ -36,34 +36,40 @@
       }
     </script>
     <style>
-      /* Hide scrollbar for Chrome, Safari and Opera */
-      .no-scrollbar::-webkit-scrollbar {
-          display: none;
-      }
-      /* Hide scrollbar for IE, Edge and Firefox */
-      .no-scrollbar {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
-      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       body {
         font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-        /* iOSでのバウンススクロールを防ぎ、アプリっぽくする */
         overscroll-behavior-y: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
       }
     </style>
   <script type="importmap">
 {
   "imports": {
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
     "react": "https://aistudiocdn.com/react@^19.2.1",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0"
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.32.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
+    "firebase/app": "https://esm.sh/firebase@11.0.2/app",
+    "firebase/firestore": "https://esm.sh/firebase@11.0.2/firestore",
+    "firebase/": "https://esm.sh/firebase@^12.7.0/",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
 </script>
 </head>
   <body class="bg-gray-100 text-primary antialiased overflow-hidden selection:bg-secondary selection:text-white">
     <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>
