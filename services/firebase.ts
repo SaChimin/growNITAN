@@ -1,30 +1,35 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 // Firebase configuration
-// 実際の設定値はユーザーが環境に合わせて更新することを想定
+// 実際の本番環境では Firebase コンソールから取得した値に置き換えてください。
 const firebaseConfig = {
-  apiKey: "...",
-  authDomain: "...",
-  projectId: "...",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "..."
+  apiKey: "YOUR_API_KEY", // ここを書き換えるまではプレビューモード
+  authDomain: "grownnitan-df55f.firebaseapp.com",
+  projectId: "grownnitan-df55f",
+  storageBucket: "grownnitan-df55f.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID",
 };
 
 // 設定が有効かどうかをチェック
-const isFirebaseConfigValid = firebaseConfig.apiKey !== "...";
+export const isFirebaseConfigValid = firebaseConfig.apiKey !== "YOUR_API_KEY" && firebaseConfig.apiKey !== "";
 
-let app;
+let auth: any;
 let db: any;
+let storage: any;
 
-if (isFirebaseConfigValid) {
-  app = initializeApp(firebaseConfig);
+try {
+  // すでにアプリが初期化されていないか確認
+  const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
   db = getFirestore(app);
-} else {
-  console.warn("Firebase config is not set. Data will not be saved to Firestore.");
-  // モックとしての振る舞い（エラー回避用）
-  db = null;
+  storage = getStorage(app);
+} catch (error) {
+  console.warn("Firebase initialization skipped or failed. Using demo mode.", error);
+  // 初期化に失敗してもアプリが死なないように最低限のエクスポートを維持
 }
 
-export { db };
+export { auth, db, storage };

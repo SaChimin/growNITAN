@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { FashionAnalysis, SearchResponse, SearchItem, UserProfile, FashionItem } from "../types";
 
